@@ -1,4 +1,5 @@
 import mysql.connector
+from tkinter import END
 
 
 def create_worker(person, profession):
@@ -27,6 +28,7 @@ def create_worker(person, profession):
 
     add_proffesion(profession, person.full_name)
 
+
 def add_proffesion(professions, person_name):
     cnt = 0
     cnx = mysql.connector.connect(user='root', password='root', port='3306',
@@ -52,6 +54,7 @@ def add_proffesion(professions, person_name):
 
     cursor.close()
     cnx.close()
+
 
 def check_person(full_name):
     cnx = mysql.connector.connect(user='root', password='root', port='3306',
@@ -91,6 +94,7 @@ def deleteEmployee(full_name):
     cursor.close()
     cnx.close()
 
+
 def search_worker_prof():
     cnx = mysql.connector.connect(user='root', password='root', port='3306',
                                   host='localhost', database='practica')
@@ -107,8 +111,6 @@ def search_worker_prof():
     cnx.close()
 
     return result
-
-
 
 
 def search_all_worker_prof(family_status, profesion):
@@ -149,3 +151,131 @@ def change_department_person(full_name, department):
     cnx.commit()
     cursor.close()
     cnx.close()
+
+
+def select_full_name_where_department(department):
+    cnx = mysql.connector.connect(user='root', password='root', port='3306',
+                                 host='localhost', database='practica')
+
+    cursor = cnx.cursor()
+
+    query = ("SELECT full_name FROM person WHERE department = %s")
+
+    cursor.execute(query, (department,))
+
+    result = cursor.fetchall()
+
+    cursor.close()
+    cnx.close()
+
+    return result
+
+
+def delete_full_name_where_department(full_name_list):
+    for full_name in full_name_list:
+        deleteEmployee(full_name[0])
+
+
+def updateTable(tree):
+    mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="root",
+        database="practica",
+        port='3306'
+    )
+
+    mycursor = mydb.cursor()
+
+    mycursor.execute("SELECT * FROM person")
+    updateResult = mycursor.fetchall()
+
+    for i in tree.get_children():
+        tree.delete(i)
+    for row in updateResult:
+        tree.insert("", END, values=(row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+
+    mydb.close()
+    mycursor.close()
+
+
+def create_table():
+    mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="root",
+        database="practica",
+        port='3306'
+    )
+
+    mycursor = mydb.cursor()
+
+    mycursor.execute("SELECT * FROM person")
+
+    result = mycursor.fetchall()
+
+    return result
+
+
+def find_all_profession_person(full_name):
+    mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="root",
+        database="practica",
+        port='3306'
+    )
+
+    cursor = mydb.cursor()
+
+    query = ("SELECT p.ID, pr.Profession \
+            FROM practica.person p \
+            JOIN practica.professions pr ON p.ID = pr.workerID \
+            WHERE p.full_name = %s;")
+
+    cursor.execute(query, (full_name,))
+
+    result = cursor.fetchall()
+
+    return result
+
+
+def search_all_full_name():
+    mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="root",
+        database="practica",
+        port='3306'
+    )
+
+    cursor = mydb.cursor()
+
+    query = ("SELECT full_name FROM person")
+
+    cursor.execute(query)
+
+    result = cursor.fetchall()
+
+    return result
+
+
+def search_all_department():
+
+    mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="root",
+        database="practica",
+        port='3306'
+    )
+
+    cursor = mydb.cursor()
+
+    query = ("SELECT department FROM person")
+
+    cursor.execute(query)
+
+    result = cursor.fetchall()
+
+    return result
